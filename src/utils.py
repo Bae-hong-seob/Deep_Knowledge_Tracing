@@ -1,6 +1,8 @@
 import os
 import time
 
+from .models import *
+
 class Setting:
     @staticmethod
     def seed_everything(seed):
@@ -40,7 +42,7 @@ class Setting:
         path = f'./log/{self.save_time}_{args.model}/'
         return path
 
-    def get_submit_filename(self, args):
+    def get_submit_filename(self, args, valid_auc):
         '''
         [description]
         submit file을 저장할 경로를 반환하는 함수입니다.
@@ -52,7 +54,7 @@ class Setting:
         filename : submit file을 저장할 경로를 반환합니다.
         이 때, 파일명은 submit/날짜_시간_모델명.csv 입니다.
         '''
-        filename = f'./submit/{self.save_time}_{args.model}.csv'
+        filename = f'./submit/{self.save_time}_{args.model}_{valid_auc:.3f}.csv'
         return filename
 
     def make_dir(self,path):

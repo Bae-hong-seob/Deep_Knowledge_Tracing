@@ -39,19 +39,22 @@ FEATS = [
     "median_elapsed_wrong_users", "median_elapsed_correct_users"
 ]
 
+import os
+import pickle
+import numpy as np
+
 from sklearn.metrics import roc_auc_score, accuracy_score
 
-def train(args, model, train, y_train, valid, y_valid):
+def train(args, model, x_train, y_train, x_valid, y_valid, setting):
     max_auc = 0
     
     if args.model in ('XGB', 'CATBOOST'):
-        model.fit(x,y, eval_set=[(dataloader['X_valid'], dataloader['y_valid'])])
-        valid_auc, valid_acc = valid(args, model, train, y_train, valid, y_valid)
+        model.fit(x_train,y_train, eval_set=[(x_valid, y_valid)])
+        valid_auc, valid_acc = valid(args, model, x_train, y_train, x_valid, y_valid)
         
         os.makedirs(args.saved_model_path, exist_ok=True)
         model.save_model(f'{args.saved_model_path}/{setting.save_time}_{args.model}_{valid_auc:.3f}_model.json')
                 
-        print(f'valid_loss: {valid_loss:.3f}')
         
     elif args.model in ('LIGHTGBM'):
         if args.optuna == True:
@@ -66,20 +69,22 @@ def train(args, model, train, y_train, valid, y_valid):
                 print(f"\t\t{key}: {value}")
                 
         else:
-            model.fit(X=train[FEATS], y=y_train, eval_set=[(valid[FEATS], y_valid)], eval_metric="auc", early_stopping_rounds=100, verbose=100)
-            valid_auc, valid_acc = valid(args, model, train, y_train, valid, y_valid)
+            model.fit(X=x_train[FEATS], y=y_train, eval_set=[(x_valid[FEATS], y_valid)], eval_metric="auc"
+                      #, verbose=100
+                      )
+            valid_auc, valid_acc = valid(args, model, x_train, y_train, x_valid, y_valid)
             
             os.makedirs(args.saved_model_path, exist_ok=True)
             with open(f'{args.saved_model_path}/{setting.save_time}_{args.model}_{valid_auc:.3f}_model.pkl', 'wb') as f:
                 pickle.dump(model, f)
                     
-            print(f"VALID AUC : {auc} ACC : {acc}\n")
+            print(f"VALID AUC : {valid_auc} VALID ACC : {valid_acc}\n")
         
     return model, valid_auc
 
-def valid(args, model, train, y_train, valid, y_valid):
+def valid(args, model, x_train, y_train, x_valid, y_valid):
     #  LGBoost 모델 추론
-    preds = model.predict_proba(valid[FEATS])[:, 1]
+    preds = model.predict_proba(x_valid[FEATS])[:, 1]
     acc = accuracy_score(y_valid, np.where(preds >= 0.5, 1, 0))
     auc = roc_auc_score(y_valid, preds)
  

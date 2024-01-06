@@ -1,5 +1,6 @@
 import os
 import argparse
+import pandas as pd
 
 from args import parse_args
 from src.utils import Setting, models_load
@@ -39,14 +40,14 @@ def main(args):
     ######################## Train/Valid Split
     print(f'--------------- {args.model} Train/Valid Split ---------------')
     if args.model in ('XGB'):
-        train, y_train, valid, y_valid = xgb_datasplit(data)
+        x_train, y_train, x_valid, y_valid = xgb_datasplit(data)
     elif args.model in ('LIGHTGBM'):
-        train, y_train, valid, y_valid = lightgbm_datasplit(args, data)
+        x_train, y_train, x_valid, y_valid = lightgbm_datasplit(args, data)
     elif args.model in ('CATBOOST'):
-        train, y_train, valid, y_valid = catboost_datasplit(data)
+        x_train, y_train, x_valid, y_valid = catboost_datasplit(data)
     else:
         pass
-    print(f'x_train: {train.shape}, y_train: {y_train.shape}, x_valid: {valid.shape}, y_valid: {y_valid.shape}')
+    print(f'x_train: {x_train.shape}, y_train: {y_train.shape}, x_valid: {x_valid.shape}, y_valid: {y_valid.shape}')
     
     
     ######################## MODEL LOAD
@@ -56,7 +57,7 @@ def main(args):
     
     ######################## TRAIN
     print(f'--------------- {args.model} TRAINING ---------------')
-    model, valid_auc = train(args, model, train, y_train, valid, y_valid)
+    model, valid_auc = train(args, model, x_train, y_train, x_valid, y_valid, setting)
 
 
     ######################## INFERENCE
@@ -66,7 +67,9 @@ def main(args):
 
     ######################## SAVE PREDICT
     print(f'--------------- SAVE {args.model} PREDICT ---------------')
-    write_path = os.path.join(data_dir, "submission_Lgbm.csv")
+    filename = setting.get_submit_filename(args, valid_auc)
+    
+    write_path = os.path.join(filename)
     with open(write_path, "w", encoding="utf8") as w:
         w.write("id,prediction\n")
         for id, p in enumerate(predicts):
@@ -75,7 +78,6 @@ def main(args):
     submission = pd.read_csv(args.data_dir + 'sample_submission.csv')
     submission['prediction'] = predicts
 
-    filename = setting.get_submit_filename(args)
     submission.to_csv(filename, index=False)
     print('make csv file !!! ', filename)
 
