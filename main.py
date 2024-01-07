@@ -45,7 +45,10 @@ def main(args):
         train_data, label = data[data['answerCode'] != -1], "answerCode"
         
         print(f'--------------- TRAINING ---------------')
-        predictor = TabularPredictor(label=label, eval_metric="roc_auc", problem_type="binary").fit(train_data, presets=["best_quality"])
+        if args.use_cuda_if_available: #GPU
+            predictor = TabularPredictor(label=label, eval_metric="roc_auc", problem_type="binary").fit(train_data, presets=["best_quality"], num_gpus=1)
+        else: #CPU
+            predictor = TabularPredictor(label=label, eval_metric="roc_auc", problem_type="binary").fit(train_data, presets=["best_quality"])
         
         print(f'--------------- PREDICT ---------------')
         test_data = data[data.dataset == 2]
