@@ -1,5 +1,7 @@
 import os
 import time
+import numpy as np
+import random
 
 from .models import *
 
@@ -16,9 +18,6 @@ class Setting:
         random.seed(seed)
         os.environ['PYTHONHASHSEED'] = str(seed)
         np.random.seed(seed)
-        torch.manual_seed(seed)
-        torch.cuda.manual_seed(seed)
-        torch.backends.cudnn.deterministic = True
 
     def __init__(self):
         now = time.localtime()

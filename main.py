@@ -13,6 +13,7 @@ from autogluon.tabular import TabularDataset, TabularPredictor
 
 
 def main(args):
+    Setting.seed_everything(args.seed)
     ####################### Setting for Log
     setting = Setting()
     

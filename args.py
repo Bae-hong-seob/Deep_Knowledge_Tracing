@@ -25,6 +25,8 @@ def parse_args():
     
     ############### LightGBM OPTION
     arg("--n_estimators", default=1000, type=int, help="n_estimators")
+    arg("--lambda_l1", default=0.0, type=float, help='L1 Norm')
+    arg("--lambda_l2", default=0.0, type=float, help='L2 Norm')
     
     
     args = parser.parse_args()
