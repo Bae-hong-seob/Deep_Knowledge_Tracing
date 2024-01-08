@@ -42,9 +42,7 @@ import numpy as np
 
 from sklearn.metrics import roc_auc_score, accuracy_score
 
-def train(args, model, x_train, y_train, x_valid, y_valid, setting):
-    max_auc = 0
-    
+def train(args, model, x_train, y_train, x_valid, y_valid, setting):    
     if args.model in ('XGB', 'CATBOOST'):
         model.fit(x_train,y_train, eval_set=[(x_valid, y_valid)])
         valid_auc, valid_acc = valid(args, model, x_train, y_train, x_valid, y_valid)
@@ -69,17 +67,17 @@ def train(args, model, x_train, y_train, x_valid, y_valid, setting):
             model.fit(X=x_train[FEATS], y=y_train, eval_set=[(x_valid[FEATS], y_valid)], eval_metric="auc"
                       #, verbose=100
                       )
-            valid_auc, valid_acc = valid(args, model, x_train, y_train, x_valid, y_valid)
+            valid_auc, valid_acc = valid(args, model, x_valid, y_valid)
             
             os.makedirs(args.saved_model_path, exist_ok=True)
-            with open(f'{args.saved_model_path}/{setting.save_time}_{args.model}_{valid_auc:.3f}_model.pkl', 'wb') as f:
+            with open(f'{args.saved_model_path}/{setting.save_time}_{args.model}_{valid_auc:.4f}_model.pkl', 'wb') as f:
                 pickle.dump(model, f)
                     
             print(f"VALID AUC : {valid_auc} VALID ACC : {valid_acc}\n")
         
     return model, valid_auc
 
-def valid(args, model, x_train, y_train, x_valid, y_valid):
+def valid(args, model, x_valid, y_valid):
     #  LGBoost 모델 추론
     preds = model.predict_proba(x_valid[FEATS])[:, 1]
     acc = accuracy_score(y_valid, np.where(preds >= 0.5, 1, 0))

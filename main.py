@@ -67,7 +67,7 @@ def main(args):
             output = predictor.evaluate(train_data, silent=True)
             valid_auc = output["roc_auc"]
         except:
-            valid_auc = 0.000
+            valid_auc = 0.0000
         
 
     ######################## Train/Valid Split
