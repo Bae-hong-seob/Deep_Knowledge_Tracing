@@ -3,7 +3,6 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 def lightgbm_preprocess_data(df):
-    print('######################## DATA PREPROCESSING START !!!')
 
     ########## 기본 feature ##########
 
@@ -31,24 +30,24 @@ def lightgbm_preprocess_data(df):
         grouping += [i] * (index[i] - index[i-1])
     df['grouping'] = grouping
 
-    # 문항별 Mean Encoding
-    per_test = df.groupby(["testId"])["answerCode"].agg(["mean", "sum"])
-    per_test.columns = ["answerRate_per_test", "answerCount_per_test"]
+    # 시험지별 Mean Encoding
+    per_test = df.groupby(["testId"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
+    per_test.columns = ["answerRate_per_test", "answerCount_per_test", "answerVar_per_test", "answerStd_per_test"]
     df = pd.merge(df, per_test, on=["testId"], how="left")
 
     # Tag별 Mean Encoding
-    per_tag = df.groupby(["KnowledgeTag"])["answerCode"].agg(["mean", "sum"])
-    per_tag.columns = ["answerRate_per_tag", "answerCount_per_tag"]
+    per_tag = df.groupby(["KnowledgeTag"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
+    per_tag.columns = ["answerRate_per_tag", "answerCount_per_tag", "answerVar_per_tag", "answerStd_per_tag"]
     df = pd.merge(df, per_tag, on=["KnowledgeTag"], how="left")
 
-    # 시험지별 Mean Encoding
-    per_ass = df.groupby(["assessmentItemID"])["answerCode"].agg(["mean", "sum"])
-    per_ass.columns = ["answerRate_per_ass", "answerCount_per_ass"]
+    # 문항별 Mean Encoding
+    per_ass = df.groupby(["assessmentItemID"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
+    per_ass.columns = ["answerRate_per_ass", "answerCount_per_ass", "answerVar_per_ass", "answerStd_per_ass"]
     df = pd.merge(df, per_ass, on=["assessmentItemID"], how="left")
 
     # 문제 번호별 Mean Encoding
-    per_pnum = df.groupby(["problem_number"])["answerCode"].agg(["mean", "sum"])
-    per_pnum.columns = ["answerRate_per_pnum", "answerCount_per_pnum"]
+    per_pnum = df.groupby(["problem_number"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
+    per_pnum.columns = ["answerRate_per_pnum", "answerCount_per_pnum", "answerVar_per_pnum", "answerStd_per_pnum"]
     df = pd.merge(df, per_pnum, on=["problem_number"], how="left")
 
     # 시험지 별 문제 수와 태그 수
@@ -146,8 +145,6 @@ def lightgbm_preprocess_data(df):
     df["acc_count_per_cat"] = df.groupby(["userID", "category"]).cumcount()
     df["acc_answerRate_per_cat"] = (df["correct_answer_per_cat"] / df["acc_count_per_cat"]).fillna(0)
     df["acc_elapsed_per_cat"] = (df.groupby(["userID", "category"])["elapsed"].transform(lambda x: x.cumsum()).fillna(0))
-    
-    print('######################## DATA PREPROCESSING DONE !!!')
     
     return df
 

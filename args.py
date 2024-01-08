@@ -20,7 +20,8 @@ def parse_args():
     arg("--lr", default=0.001, type=float, help="")
     arg("--model_dir", default="./models/", type=str, help="")
     arg("--model_name", default="best_model.pt", type=str, help="")
-    arg('--autogluon', type=bool, default=False, help='하이퍼 파라미터 자동 최적화 설정입니다.')
+    arg("--optuna", default=False, type=bool, help='Hyperparameter Tuning 여부입니다.')
+    arg('--autogluon', type=bool, default=False, help='AutoML(autogluon) 사용여부 입니다.')
     
     ############### LightGBM OPTION
     arg("--n_estimators", default=1000, type=int, help="n_estimators")

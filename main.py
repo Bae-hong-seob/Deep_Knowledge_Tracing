@@ -38,10 +38,12 @@ def main(args):
         catboost_data = catboost_dataloader(args)
     else:
         pass
+    print('######################## DATA PREPROCESSING DONE !!!')
+
     
     ######################## Autogluon
-    print(f'--------------- {args.autogluon} ---------------')
     if args.autogluon == True:
+        print(f'--------------- {args.autogluon} ---------------')
         args.model = 'Ensemble'
         train_data, label = data[data['answerCode'] != -1], "answerCode"
         
