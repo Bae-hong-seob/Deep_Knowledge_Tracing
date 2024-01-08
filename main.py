@@ -42,6 +42,7 @@ def main(args):
     ######################## Autogluon
     print(f'--------------- {args.autogluon} ---------------')
     if args.autogluon == True:
+        args.model = 'Ensemble'
         train_data, label = data[data['answerCode'] != -1], "answerCode"
         
         print(f'--------------- TRAINING ---------------')
@@ -54,18 +55,16 @@ def main(args):
         test_data = data[data.dataset == 2]
         test_data = test_data[test_data["userID"] != test_data["userID"].shift(-1)]
         test_data = test_data.drop(["answerCode"], axis=1)
-        predicts = predictor.predict_proba(test_data)
+        
+        predicts_df = predictor.predict_proba(test_data)
+        predicts_df['predicts'] = predicts_df[[0, 1]].max(axis=1)
+        predicts = predicts_df['predicts']
         
         try:
-            output = predictor.evaluate(test_data, silent=True)
+            output = predictor.evaluate(train_data, silent=True)
             valid_auc = output["roc_auc"]
         except:
             valid_auc = 0.000
-            
-        os.makedirs(args.saved_model_path, exist_ok=True)
-        with open(f'{args.saved_model_path}/{setting.save_time}_Autogluon_{valid_auc:.3f}_model.pkl', 'wb') as f:
-            pickle.dump(model, f)
-        
         
 
     ######################## Train/Valid Split
