@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np 
 
 from sklearn.model_selection import train_test_split
 
@@ -30,22 +31,34 @@ def lightgbm_preprocess_data(df):
         grouping += [i] * (index[i] - index[i-1])
     df['grouping'] = grouping
 
-    # 시험지별 Mean Encoding
+    # 시험지별 문제 길이, 푼 사용자 수
+    length_test = df.groupby('testId')['assessmentItemID'].nunique().reset_index()
+    length_test.columns = ['testId', 'length_per_test']
+
+    frequency_of_test = df['testId'].value_counts().sort_index().values
+
+    if not np.array_equal(np.array(frequency_of_test/length_test['length_per_test'], dtype=int), np.array(frequency_of_test/length_test['length_per_test'])):
+        raise print('사용자 수가 올바르지 않습니다')
+
+    length_test['number_of_users_per_test'] = np.array(frequency_of_test/length_test['length_per_test'], dtype=int)
+    df = pd.merge(df, length_test, on=['testId'], how='left')
+
+    # 시험지별 정답 평균, 개수, 분산, 표준편차
     per_test = df.groupby(["testId"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
     per_test.columns = ["answerRate_per_test", "answerCount_per_test", "answerVar_per_test", "answerStd_per_test"]
     df = pd.merge(df, per_test, on=["testId"], how="left")
 
-    # Tag별 Mean Encoding
+    # Tag별 정답 평균, 개수, 분산, 표준편차
     per_tag = df.groupby(["KnowledgeTag"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
     per_tag.columns = ["answerRate_per_tag", "answerCount_per_tag", "answerVar_per_tag", "answerStd_per_tag"]
     df = pd.merge(df, per_tag, on=["KnowledgeTag"], how="left")
 
-    # 문항별 Mean Encoding
+    # 문항별 정답 평균, 개수, 분산, 표준편차
     per_ass = df.groupby(["assessmentItemID"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
     per_ass.columns = ["answerRate_per_ass", "answerCount_per_ass", "answerVar_per_ass", "answerStd_per_ass"]
     df = pd.merge(df, per_ass, on=["assessmentItemID"], how="left")
 
-    # 문제 번호별 Mean Encoding
+    # 문제 번호별 정답 평균, 개수, 분산, 표준편차
     per_pnum = df.groupby(["problem_number"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
     per_pnum.columns = ["answerRate_per_pnum", "answerCount_per_pnum", "answerVar_per_pnum", "answerStd_per_pnum"]
     df = pd.merge(df, per_pnum, on=["problem_number"], how="left")

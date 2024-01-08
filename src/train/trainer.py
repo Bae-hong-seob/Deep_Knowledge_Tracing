@@ -1,6 +1,7 @@
 # Feature Selection
 FEATS = [
     "KnowledgeTag",
+    'length_per_test', 'number_of_users_per_test',
     "answerRate_per_tag", "answerCount_per_tag", "answerVar_per_tag", "answerStd_per_tag",
     "tag_count",
     "mean_elp_tag_all",
