@@ -1,3 +1,4 @@
+# autogluon 사용할 시
 conda create -n ag python=3.10
 pip install torch==2.0.1+cu118 torchvision==0.15.2+cu118 --index-url https://download.pytorch.org/whl/cu118
 conda install lightgbm

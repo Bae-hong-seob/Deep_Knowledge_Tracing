@@ -1,19 +1,27 @@
 # Feature Selection
 FEATS = [
+    #'userID', # 추가 시 valid 증가, public 감소. 과적합 의심
     "KnowledgeTag",
-    'length_per_test', 'number_of_users_per_test',
+    'solve_count_per_test', 'number_of_users_per_test', 
+    #'not_solving_count_per_test', 'problem_solving_rate_per_test', # 시험지 별 안 푼 문제 개수, 문제를 푼 비율 -> valid score감소, public score 감소
     "answerRate_per_tag", "answerCount_per_tag", "answerVar_per_tag", "answerStd_per_tag",
     "tag_count",
-    "mean_elp_tag_all",
-    "mean_elp_tag_o",
-    "mean_elp_tag_x",
+    "mean_elp_tag_all_mean", 
+    #"mean_elp_tag_all_sum", "mean_elp_tag_all_var", "mean_elp_tag_all_std",
+    "mean_elp_tag_o_mean", 
+    #"mean_elp_tag_o_sum", "mean_elp_tag_o_var", "mean_elp_tag_o_std",
+    "mean_elp_tag_x_mean", 
+    #"mean_elp_tag_x_sum", "mean_elp_tag_x_var", "mean_elp_tag_x_std",
     "answerRate_per_test", "answerCount_per_test", "answerVar_per_test", "answerStd_per_test",
     "cum_answerRate_per_user",
     "problem_correct_per_user",
     "problem_solved_per_user",
-    "mean_elp_ass_all",
-    "mean_elp_ass_o",
-    "mean_elp_ass_x",
+    "mean_elp_ass_all_mean", 
+    #"mean_elp_ass_all_sum", "mean_elp_ass_all_var", "mean_elp_ass_all_std",
+    "mean_elp_ass_o_mean", 
+    #"mean_elp_ass_o_sum", "mean_elp_ass_o_var", "mean_elp_ass_o_std",
+    "mean_elp_ass_x_mean", 
+    #"mean_elp_ass_x_sum", "mean_elp_ass_x_var", "mean_elp_ass_x_std",
     "answerRate_per_ass", "answerCount_per_ass", "answerVar_per_ass", "answerStd_per_ass",
     "elapsed",
     'elapsed_shift',
@@ -23,9 +31,12 @@ FEATS = [
     "acc_elapsed_per_cat",
     "correct_answer_per_cat",
     "test_number",
-    "mean_elp_pnum_all",
-    "mean_elp_pnum_o",
-    "mean_elp_pnum_x",
+    "mean_elp_pnum_all_mean", 
+    #"mean_elp_pnum_all_sum", "mean_elp_pnum_all_var", "mean_elp_pnum_all_std",
+    "mean_elp_pnum_o_mean", 
+    #"mean_elp_pnum_o_sum", "mean_elp_pnum_o_var", "mean_elp_pnum_o_std",
+    "mean_elp_pnum_x_mean", 
+    #"mean_elp_pnum_x_sum", "mean_elp_pnum_x_var", "mean_elp_pnum_x_std",
     "acc_tag_count_per_user",
     "problem_count",
     "problem_number",
@@ -75,7 +86,7 @@ def train(args, model, x_train, y_train, x_valid, y_valid, setting):
                     
             print(f"VALID AUC : {valid_auc} VALID ACC : {valid_acc}\n")
         
-    return model, valid_auc
+    return model, valid_auc, valid_acc
 
 def valid(args, model, x_valid, y_valid):
     #  LGBoost 모델 추론

@@ -91,7 +91,7 @@ def main(args):
         
         ######################## TRAIN
         print(f'--------------- {args.model} TRAINING ---------------')
-        model, valid_auc = train(args, model, x_train, y_train, x_valid, y_valid, setting)
+        model, valid_auc, valid_acc = train(args, model, x_train, y_train, x_valid, y_valid, setting)
 
 
         ######################## INFERENCE
@@ -101,6 +101,10 @@ def main(args):
 
     ######################## SAVE PREDICT
     print(f'--------------- SAVE PREDICT ---------------')
+    with open('record.txt', 'a') as f:
+        f.write(f"Tiemstamp:{setting.save_time}, valid auc:{valid_auc}, valid_acc:{valid_acc}\n")
+    f.close()
+    
     filename = setting.get_submit_filename(args, valid_auc)
     submission = pd.read_csv(args.data_dir + 'sample_submission.csv')
     submission['prediction'] = predicts
