@@ -158,15 +158,28 @@ def lightgbm_preprocess_data(df):
 
     ########## User 관련 ##########
 
-    # User별 정답률, 문제푼 횟수, 맞춘 문제수
+    # 유저별 전체 정답률 평균,분산,표준편차
+    correct_rate_per_user = df[df['answerCode'] != -1].groupby('userID')['answerCode'].agg(['mean', 'var', 'std']).reset_index()
+    correct_rate_per_user.columns = ['userID', 'correct_mean_per_user', 'correct_var_per_user', 'correct_std_per_user']
+    df = pd.merge(df, correct_rate_per_user, on=['userID'], how='left')
+
+    # 유저별 시계열 정답률, 문제푼 횟수, 맞춘 문제수
     df["problem_correct_per_user"] = (df.groupby("userID")["answerCode"].transform(lambda x: x.cumsum().shift(1)).fillna(0))
     df["problem_solved_per_user"] = df.groupby("userID")["answerCode"].cumcount()
     df["cum_answerRate_per_user"] = (df["problem_correct_per_user"] / df["problem_solved_per_user"]).fillna(0)
-
-    # 유저별 Tag 문제 누적 값
+    
+    # 유저별 태그 시계열 누적 값
     df["acc_tag_count_per_user"] = df.groupby(["userID", "KnowledgeTag"]).cumcount()
+    
+    # 유저별 태그별 문제풀이 횟수, 정답률(평균), 분산, 표준편차
+    tag_per_user = df[df['answerCode'] != -1].groupby(['userID', 'KnowledgeTag'])['answerCode'].agg(['count', 'mean', 'var', 'std'])
+    tag_per_user = tag_per_user.T.unstack().reset_index()
+    tag_per_user.columns = ['userID', 'KnowledgeTag', 'statistic', 'value']
+    tag_per_user = tag_per_user.pivot_table(index=['userID', 'KnowledgeTag'], columns='statistic', values='value', fill_value=0).reset_index()
+    tag_per_user.columns = ['userID', 'KnowledgeTag', 'number_of_sloved_per_tag', 'correct_mean_per_tag', 'correct_var_per_tag', 'correct_std_per_tag']
+    df = pd.merge(df, tag_per_user, on=['userID', 'KnowledgeTag'], how='left')
 
-    # User별로 대분류별 맞춘 문제 개수, 대분류별 맞춘 문제 개수, 대분류별 정답률
+    # 유저별로 대분류별 맞춘 문제 개수, 대분류별 맞춘 문제 개수, 대분류별 정답률
     df["correct_answer_per_cat"] = (df.groupby(["userID", "category"])["answerCode"].transform(lambda x: x.cumsum().shift(1)).fillna(0))
     df["acc_count_per_cat"] = df.groupby(["userID", "category"]).cumcount()
     df["acc_answerRate_per_cat"] = (df["correct_answer_per_cat"] / df["acc_count_per_cat"]).fillna(0)

@@ -13,9 +13,6 @@ FEATS = [
     "mean_elp_tag_x_mean", 
     #"mean_elp_tag_x_sum", "mean_elp_tag_x_var", "mean_elp_tag_x_std",
     "answerRate_per_test", "answerCount_per_test", "answerVar_per_test", "answerStd_per_test",
-    "cum_answerRate_per_user",
-    "problem_correct_per_user",
-    "problem_solved_per_user",
     "mean_elp_ass_all_mean", 
     #"mean_elp_ass_all_sum", "mean_elp_ass_all_var", "mean_elp_ass_all_std",
     "mean_elp_ass_o_mean", 
@@ -46,6 +43,9 @@ FEATS = [
     'timestep_1', 'timestep_2', 'timestep_3', 'timestep_4', 'timestep_5', #제거 시 valid, public score 모두 감소
     "median_elapsed_wrong_users", "median_elapsed_correct_users",
     "mean_elapsed_wrong_users", "mean_elapsed_correct_users",
+    "cum_answerRate_per_user", "problem_correct_per_user", "problem_solved_per_user",
+    'correct_mean_per_user', 'correct_var_per_user', 'correct_std_per_user',
+    #'number_of_sloved_per_tag', 'correct_mean_per_tag', 'correct_var_per_tag', 'correct_std_per_tag',
 ]
 
 import os
