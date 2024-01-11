@@ -9,7 +9,7 @@ def lightgbm_preprocess_data(df):
 
     # 유저별 시퀀스를 고려하기 위해 정렬
     df.sort_values(by=["userID", "Timestamp"], inplace=True)
-    df.reset_index(inplace = True)
+    df.reset_index(inplace = True, drop=True)
 
     # 카테고리형 feature
     categories = ['userID',"assessmentItemID", "testId"]
@@ -133,15 +133,24 @@ def lightgbm_preprocess_data(df):
     for i in range(1,6):
         df[f"timestep_{i}"] = df.groupby("userID")["answerCode"].shift(i).fillna(1).astype(int)
 
-    df_time = df[["userID", "elapsed"]].groupby(["userID"]).agg("median").reset_index()
-    df_time.rename(columns={"elapsed": "user_median_elapsed"}, inplace=True)
-    df = df.merge(df_time, on="userID", how="left")
+    # 유저별 문제풀이 중앙값, 평균과의 차이
+    df_time = df.groupby(["userID"])['elapsed'].agg(["median", 'mean'])
+    df_time.columns = ['user_median_elapsed', 'user_mean_elapsed']
+    df = pd.merge(df, df_time, on=['userID'], how='left')
     df["timeDelta_userAverage"] = df["elapsed"] - df["user_median_elapsed"]
-
-    # 문제 정답 / 오답자들의 문제 풀이 시간 중위수
+        
+    # 문제 정답 / 오답자들의 문제 풀이 시간 중앙값
     col_name = ["median_elapsed_wrong_users", "median_elapsed_correct_users"]
     for i in range(2):
         df_median_elapsed = (df[["assessmentItemID", "answerCode", "elapsed"]].groupby(["assessmentItemID", "answerCode"]).agg("median").reset_index())
+        df_median_elapsed = df_median_elapsed[df_median_elapsed["answerCode"] == i].drop("answerCode", axis=1)
+        df_median_elapsed.rename(columns={"elapsed": col_name[i]}, inplace=True)
+        df = df.merge(df_median_elapsed, on=["assessmentItemID"], how="left")
+
+    # 문제 정답 / 오답자들의 문제 풀이 시간 평균
+    col_name = ["mean_elapsed_wrong_users", "mean_elapsed_correct_users"]
+    for i in range(2):
+        df_median_elapsed = (df[["assessmentItemID", "answerCode", "elapsed"]].groupby(["assessmentItemID", "answerCode"]).agg("mean").reset_index())
         df_median_elapsed = df_median_elapsed[df_median_elapsed["answerCode"] == i].drop("answerCode", axis=1)
         df_median_elapsed.rename(columns={"elapsed": col_name[i]}, inplace=True)
         df = df.merge(df_median_elapsed, on=["assessmentItemID"], how="left")

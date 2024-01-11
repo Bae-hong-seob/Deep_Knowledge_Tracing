@@ -3,7 +3,7 @@ FEATS = [
     #'userID', # 추가 시 valid 증가, public 감소. 과적합 의심
     "KnowledgeTag",
     'solve_count_per_test', 'number_of_users_per_test', 
-    #'not_solving_count_per_test', 'problem_solving_rate_per_test', # 시험지 별 안 푼 문제 개수, 문제를 푼 비율 -> valid score감소, public score 감소
+    #'not_solving_count_per_test', 'problem_solving_rate_per_test', # 시험지 별 안 푼 문제 개수, 문제를 푼 비율 추가 시 -> valid score감소, public score 감소
     "answerRate_per_tag", "answerCount_per_tag", "answerVar_per_tag", "answerStd_per_tag",
     "tag_count",
     "mean_elp_tag_all_mean", 
@@ -43,8 +43,9 @@ FEATS = [
     "answerRate_per_pnum", "answerCount_per_pnum", "answerVar_per_pnum", "answerStd_per_pnum",
     "problem_position",
     'timeDelta_userAverage',
-    'timestep_1', 'timestep_2', 'timestep_3', 'timestep_4', 'timestep_5',
-    "median_elapsed_wrong_users", "median_elapsed_correct_users"
+    'timestep_1', 'timestep_2', 'timestep_3', 'timestep_4', 'timestep_5', #제거 시 valid, public score 모두 감소
+    "median_elapsed_wrong_users", "median_elapsed_correct_users",
+    "mean_elapsed_wrong_users", "mean_elapsed_correct_users",
 ]
 
 import os
@@ -75,6 +76,7 @@ def train(args, model, x_train, y_train, x_valid, y_valid, setting):
                 print(f"\t\t{key}: {value}")
                 
         else:
+            print(f'after feature selection -> x_train: {x_train[FEATS].shape}, y_train: {y_train.shape}, x_valid: {x_valid[FEATS].shape}, y_valid: {y_valid.shape}')
             model.fit(X=x_train[FEATS], y=y_train, eval_set=[(x_valid[FEATS], y_valid)], eval_metric="auc"
                       #, verbose=100
                       )

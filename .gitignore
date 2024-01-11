@@ -1,5 +1,6 @@
 data
 saved_models
+predict.py
 test.py
 AutogluonModels
 record.txt
