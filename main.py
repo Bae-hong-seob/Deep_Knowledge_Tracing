@@ -7,6 +7,7 @@ from src.utils import Setting, models_load
 from src.data_preprocess.xgb_data import xgb_dataloader, xgb_preprocess_data,xgb_datasplit
 from src.data_preprocess.lightgbm_data import lightgbm_dataloader, lightgbm_preprocess_data, lightgbm_datasplit
 from src.data_preprocess.catboost_data import catboost_dataloader, catboost_preprocess_data,catboost_datasplit
+from src.data_preprocess.feature_selection import feature_selection
 from src.train import train, test
 
 from autogluon.tabular import TabularDataset, TabularPredictor
@@ -76,12 +77,14 @@ def main(args):
         if args.model in ('XGB'):
             x_train, y_train, x_valid, y_valid = xgb_datasplit(data)
         elif args.model in ('LIGHTGBM'):
+            data = data.select_dtypes(include=['int', 'float', 'bool']) #lightgbm은 int,flot or bool type변수만 받아들임.
             x_train, y_train, x_valid, y_valid = lightgbm_datasplit(args, data)
         elif args.model in ('CATBOOST'):
             x_train, y_train, x_valid, y_valid = catboost_datasplit(data)
         else:
             pass
-        print(f'x_train: {x_train.shape}, y_train: {y_train.shape}, x_valid: {x_valid.shape}, y_valid: {y_valid.shape}')
+        x_test = data[data['answerCode'] == -1].drop(["answerCode"], axis=1)
+        print(f'x_train: {x_train.shape}, y_train: {y_train.shape}, x_valid: {x_valid.shape}, y_valid: {y_valid.shape}, test:{x_test.shape}')
     
     
         ######################## MODEL LOAD
@@ -92,11 +95,18 @@ def main(args):
         ######################## TRAIN
         print(f'--------------- {args.model} TRAINING ---------------')
         model, valid_auc, valid_acc = train(args, model, x_train, y_train, x_valid, y_valid, setting)
-
+        
+        if args.feature_selection:
+            print(f'--------------- {args.model} FEATURE SELECT ---------------')
+            feature_selected_model = models_load(args)
+            model, x_test = feature_selection(args, model, feature_selected_model, x_train, y_train, x_valid, y_valid, x_test, setting)
+        else:
+            pass
+        
 
         ######################## INFERENCE
         print(f'--------------- {args.model} PREDICT ---------------')
-        predicts = test(args, model, data)
+        predicts = test(args, model, x_test)
 
 
     ######################## SAVE PREDICT

@@ -13,6 +13,9 @@ FEATS = [
     "mean_elp_tag_x_mean", 
     #"mean_elp_tag_x_sum", "mean_elp_tag_x_var", "mean_elp_tag_x_std",
     "answerRate_per_test", "answerCount_per_test", "answerVar_per_test", "answerStd_per_test",
+    "cum_answerRate_per_user",
+    "problem_correct_per_user",
+    "problem_solved_per_user",
     "mean_elp_ass_all_mean", 
     #"mean_elp_ass_all_sum", "mean_elp_ass_all_var", "mean_elp_ass_all_std",
     "mean_elp_ass_o_mean", 
@@ -42,9 +45,9 @@ FEATS = [
     'timeDelta_userAverage',
     'timestep_1', 'timestep_2', 'timestep_3', 'timestep_4', 'timestep_5', #제거 시 valid, public score 모두 감소
     "median_elapsed_wrong_users", "median_elapsed_correct_users",
-    "mean_elapsed_wrong_users", "mean_elapsed_correct_users",
-    "cum_answerRate_per_user", "problem_correct_per_user", "problem_solved_per_user",
-    'correct_mean_per_user', 'correct_var_per_user', 'correct_std_per_user',
+    #"mean_elapsed_wrong_users", "mean_elapsed_correct_users",
+    #"cum_answerRate_per_user", "problem_correct_per_user", "problem_solved_per_user",
+    #'correct_mean_per_user', 'correct_var_per_user', 'correct_std_per_user',
     #'number_of_sloved_per_tag', 'correct_mean_per_tag', 'correct_var_per_tag', 'correct_std_per_tag',
 ]
 
@@ -76,11 +79,20 @@ def train(args, model, x_train, y_train, x_valid, y_valid, setting):
                 print(f"\t\t{key}: {value}")
                 
         else:
-            print(f'after feature selection -> x_train: {x_train[FEATS].shape}, y_train: {y_train.shape}, x_valid: {x_valid[FEATS].shape}, y_valid: {y_valid.shape}')
-            model.fit(X=x_train[FEATS], y=y_train, eval_set=[(x_valid[FEATS], y_valid)], eval_metric="auc"
-                      #, verbose=100
-                      )
-            valid_auc, valid_acc = valid(args, model, x_valid, y_valid)
+            if args.feature_selection:
+                model.fit(X=x_train, y=y_train, eval_set=[(x_valid, y_valid)], eval_metric="auc")
+                valid_auc, valid_acc = valid(args, model, x_valid, y_valid)
+                
+                feature_importance_df = pd.DataFrame({'Feature': x_train.columns, 'Importance': model.feature_importances_}).sort_values(by='Importance', ascending=False)
+                
+            else:
+                print(f'use FEATS feature -> x_train: {x_train[FEATS].shape}, y_train: {y_train.shape}, x_valid: {x_valid[FEATS].shape}, y_valid: {y_valid.shape}')
+                model.fit(X=x_train[FEATS], y=y_train, eval_set=[(x_valid[FEATS], y_valid)], eval_metric="auc")
+                valid_auc, valid_acc = valid(args, model, x_valid[FEATS], y_valid)
+                
+                feature_importance_df = pd.DataFrame({'Feature': x_train.columns, 'Importance': model.feature_importances_}).sort_values(by='Importance', ascending=False)
+            
+            feature_importance_df.to_csv(f'./{setting.save_time}_{args.model}_feature_importance.csv')
             
             os.makedirs(args.saved_model_path, exist_ok=True)
             with open(f'{args.saved_model_path}/{setting.save_time}_{args.model}_{valid_auc:.4f}_model.pkl', 'wb') as f:
@@ -92,22 +104,16 @@ def train(args, model, x_train, y_train, x_valid, y_valid, setting):
 
 def valid(args, model, x_valid, y_valid):
     #  LGBoost 모델 추론
-    preds = model.predict_proba(x_valid[FEATS])[:, 1]
+    preds = model.predict_proba(x_valid)[:, 1]
     acc = accuracy_score(y_valid, np.where(preds >= 0.5, 1, 0))
     auc = roc_auc_score(y_valid, preds)
  
     return auc, acc
 
-def test(args, model, df):
-    
-    test_df = df[df.dataset == 2]
-    # LEAVE LAST INTERACTION ONLY
-    test_df = test_df[test_df["userID"] != test_df["userID"].shift(-1)]
-
-    # DROP ANSWERCODE
-    test_df = test_df.drop(["answerCode"], axis=1)
-
-    # MAKE PREDICTION
-    probs = model.predict_proba(test_df[FEATS])[:,-1]
+def test(args, model, test_df):
+    if args.feature_selection:
+        probs = model.predict_proba(test_df)[:,-1]
+    else:
+        probs = model.predict_proba(test_df[FEATS])[:,-1]
         
     return probs
