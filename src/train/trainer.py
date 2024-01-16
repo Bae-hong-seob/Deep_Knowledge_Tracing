@@ -54,6 +54,7 @@ FEATS = [
 import os
 import pickle
 import numpy as np
+import pandas as pd
 
 from sklearn.metrics import roc_auc_score, accuracy_score
 
@@ -83,16 +84,17 @@ def train(args, model, x_train, y_train, x_valid, y_valid, setting):
                 model.fit(X=x_train, y=y_train, eval_set=[(x_valid, y_valid)], eval_metric="auc")
                 valid_auc, valid_acc = valid(args, model, x_valid, y_valid)
                 
-                feature_importance_df = pd.DataFrame({'Feature': x_train.columns, 'Importance': model.feature_importances_}).sort_values(by='Importance', ascending=False)
+                feature_importance_df = pd.DataFrame({'Feature': x_train.columns, 'Importance': model.feature_importances_})
                 
             else:
                 print(f'use FEATS feature -> x_train: {x_train[FEATS].shape}, y_train: {y_train.shape}, x_valid: {x_valid[FEATS].shape}, y_valid: {y_valid.shape}')
                 model.fit(X=x_train[FEATS], y=y_train, eval_set=[(x_valid[FEATS], y_valid)], eval_metric="auc")
                 valid_auc, valid_acc = valid(args, model, x_valid[FEATS], y_valid)
                 
-                feature_importance_df = pd.DataFrame({'Feature': x_train.columns, 'Importance': model.feature_importances_}).sort_values(by='Importance', ascending=False)
+                feature_importance_df = pd.DataFrame({'Feature': x_train[FEATS].columns, 'Importance': model.feature_importances_})
             
-            feature_importance_df.to_csv(f'./{setting.save_time}_{args.model}_feature_importance.csv')
+            feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
+            feature_importance_df.to_csv(f'./{setting.save_time}_{args.model}_feature_importance.csv', index=False)
             
             os.makedirs(args.saved_model_path, exist_ok=True)
             with open(f'{args.saved_model_path}/{setting.save_time}_{args.model}_{valid_auc:.4f}_model.pkl', 'wb') as f:

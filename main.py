@@ -8,7 +8,7 @@ from src.data_preprocess.xgb_data import xgb_dataloader, xgb_preprocess_data,xgb
 from src.data_preprocess.lightgbm_data import lightgbm_dataloader, lightgbm_preprocess_data, lightgbm_datasplit
 from src.data_preprocess.catboost_data import catboost_dataloader, catboost_preprocess_data,catboost_datasplit
 from src.data_preprocess.feature_selection import feature_selection
-from src.train import train, test
+from src.train import train, valid, test
 
 from autogluon.tabular import TabularDataset, TabularPredictor
 
@@ -99,7 +99,9 @@ def main(args):
         if args.feature_selection:
             print(f'--------------- {args.model} FEATURE SELECT ---------------')
             feature_selected_model = models_load(args)
-            model, x_test = feature_selection(args, model, feature_selected_model, x_train, y_train, x_valid, y_valid, x_test, setting)
+            model, x_valid, x_test = feature_selection(args, model, feature_selected_model, x_train, y_train, x_valid, y_valid, x_test, setting)
+            valid_auc, valid_acc = valid(args, model, x_valid, y_valid)
+            print(f"VALID AUC : {valid_auc} VALID ACC : {valid_acc}\n")
         else:
             pass
         

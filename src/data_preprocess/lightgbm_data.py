@@ -171,13 +171,13 @@ def lightgbm_preprocess_data(df):
     # 유저별 태그 시계열 누적 값
     df["acc_tag_count_per_user"] = df.groupby(["userID", "KnowledgeTag"]).cumcount()
     
-    # 유저별 태그별 문제풀이 횟수, 정답률(평균), 분산, 표준편차
-    tag_per_user = df[df['answerCode'] != -1].groupby(['userID', 'KnowledgeTag'])['answerCode'].agg(['count', 'mean', 'var', 'std'])
-    tag_per_user = tag_per_user.T.unstack().reset_index()
-    tag_per_user.columns = ['userID', 'KnowledgeTag', 'statistic', 'value']
-    tag_per_user = tag_per_user.pivot_table(index=['userID', 'KnowledgeTag'], columns='statistic', values='value', fill_value=0).reset_index()
-    tag_per_user.columns = ['userID', 'KnowledgeTag', 'number_of_sloved_per_tag', 'correct_mean_per_tag', 'correct_var_per_tag', 'correct_std_per_tag']
-    df = pd.merge(df, tag_per_user, on=['userID', 'KnowledgeTag'], how='left')
+    # # 유저별 태그별 문제풀이 횟수, 정답률(평균), 분산, 표준편차
+    # tag_per_user = df[df['answerCode'] != -1].groupby(['userID', 'KnowledgeTag'])['answerCode'].agg(['count', 'mean', 'var', 'std'])
+    # tag_per_user = tag_per_user.T.unstack().reset_index()
+    # tag_per_user.columns = ['userID', 'KnowledgeTag', 'statistic', 'value']
+    # tag_per_user = tag_per_user.pivot_table(index=['userID', 'KnowledgeTag'], columns='statistic', values='value', fill_value=0).reset_index()
+    # tag_per_user.columns = ['userID', 'KnowledgeTag', 'number_of_sloved_per_tag', 'correct_mean_per_tag', 'correct_var_per_tag', 'correct_std_per_tag']
+    # df = pd.merge(df, tag_per_user, on=['userID', 'KnowledgeTag'], how='left')
 
     # 유저별로 대분류별 맞춘 문제 개수, 대분류별 맞춘 문제 개수, 대분류별 정답률
     df["correct_answer_per_cat"] = (df.groupby(["userID", "category"])["answerCode"].transform(lambda x: x.cumsum().shift(1)).fillna(0))
@@ -219,7 +219,10 @@ def lightgbm_datasplit(args, df):
             랜덤 seed 값
     ----------
     """
-    # User별 split
+    # correct_df, wrong_df = df[df['answerCode']==1], df[df['answerCode']==0]
+    # correct1, correct2 = train_test_split(correct_df, test_size = 0.5, random_state = args.seed, shuffle = args.data_shuffle)
+    # df = pd.concat([correct1, wrong_df])
+    
     train, valid = train_test_split(df[df['answerCode'] != -1], test_size = args.test_size, random_state = args.seed, shuffle = args.data_shuffle)
 
     y_train = train["answerCode"]
