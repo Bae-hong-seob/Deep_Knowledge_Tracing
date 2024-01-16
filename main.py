@@ -77,7 +77,7 @@ def main(args):
         if args.model in ('XGB'):
             x_train, y_train, x_valid, y_valid = xgb_datasplit(data)
         elif args.model in ('LIGHTGBM'):
-            data = data.select_dtypes(include=['int', 'float', 'bool']) #lightgbm은 int,flot or bool type변수만 받아들임.
+            #data = data.select_dtypes(include=['int', 'float', 'bool']) #lightgbm은 int,flot or bool type변수만 받아들임.
             x_train, y_train, x_valid, y_valid = lightgbm_datasplit(args, data)
         elif args.model in ('CATBOOST'):
             x_train, y_train, x_valid, y_valid = catboost_datasplit(data)

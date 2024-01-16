@@ -1,10 +1,38 @@
 import pandas as pd
 import numpy as np 
 
+from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
+from .utils import basic_feature_engineering, FE_aggregation
+
 
 def lightgbm_preprocess_data(df):
+    
+    df = basic_feature_engineering(df)
+    df_1, df_2 = df.copy(), df.copy()
+    
+    fe = FE_aggregation()
+    df_user = fe.feature_per_user(df_1)
+    df_assessment = fe.feature_per_item(df_1)
+    df_tag = fe.feature_per_tag(df_1)
+    df_test = fe.feature_per_test(df_1)
+    df_cat = fe.feature_per_category(df_1)
+    df_problem_num = fe.feature_per_problem_num(df_1)
 
+    df = df_2.merge(df_user, how="left", on="userID")
+    df = df.merge(df_assessment, how="left", on="assessmentItemID")
+    df = df.merge(df_tag, how="left", on="KnowledgeTag")
+    df = df.merge(df_test, how="left", on="testId")
+    df = df.merge(df_cat, how="left", on="category_high")
+    df = df.merge(df_problem_num, how="left", on="problem_num")
+    
+    le = preprocessing.LabelEncoder()
+    for feature in df.columns:
+        if df[feature].dtypes == "object" or df[feature].dtypes == "UInt32":
+            df[feature] = le.fit_transform(df[feature])
+    
+    return df
+    
     ########## 기본 feature ##########
 
     # 유저별 시퀀스를 고려하기 위해 정렬
@@ -22,7 +50,7 @@ def lightgbm_preprocess_data(df):
     # 문제 대분류 : 시험지 카테고리, 시험지 번호, 문제 번호
     df["category"] = df["testId"].apply(lambda x: int(x[2]))
     df["test_number"] = df["testId"].apply(lambda x: int(x[-3:]))
-    df["problem_number"] = df["assessmentItemID"].apply(lambda x: int(x[-3:]))
+    df["problem_num"] = df["assessmentItemID"].apply(lambda x: int(x[-3:]))
 
     # 인접한 testId grouping
     index = df[df['testId'] != df['testId'].shift(-1)].index
@@ -45,11 +73,11 @@ def lightgbm_preprocess_data(df):
 
     # 시험지 별 문제 수와 태그 수
     f = lambda x: len(set(x))
-    test = df.groupby(["testId"]).agg({"problem_number": "max", "KnowledgeTag": f})
+    test = df.groupby(["testId"]).agg({"problem_num": "max", "KnowledgeTag": f})
     test.reset_index(inplace=True)
     test.columns = ["testId", "problem_count", "tag_count"]
     df = pd.merge(df, test, on="testId", how="left")
-    df["problem_position"] = df["problem_number"] / df["problem_count"]
+    df["problem_position"] = df["problem_num"] / df["problem_count"]
 
     # 시험지 별 안 푼 문제 개수, 문제를 푼 비율 -> valid score감소, public score 감소
     df['not_solving_count_per_test'] = df['problem_count'] - df['solve_count_per_test']
@@ -71,9 +99,9 @@ def lightgbm_preprocess_data(df):
     df = pd.merge(df, per_ass, on=["assessmentItemID"], how="left")
 
     # 문제 번호별 정답 평균, 개수, 분산, 표준편차
-    per_pnum = df.groupby(["problem_number"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
+    per_pnum = df.groupby(["problem_num"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
     per_pnum.columns = ["answerRate_per_pnum", "answerCount_per_pnum", "answerVar_per_pnum", "answerStd_per_pnum"]
-    df = pd.merge(df, per_pnum, on=["problem_number"], how="left")
+    df = pd.merge(df, per_pnum, on=["problem_num"], how="left")
 
     ########## Time 관련 ##########
 
@@ -117,19 +145,19 @@ def lightgbm_preprocess_data(df):
     df = pd.merge(df, mean_elapsed_ass_x, on=["assessmentItemID"], how="left")
 
     # 문제 번호별 모든 문제, 맞춘 문제, 틀린 문제별 풀이 시간의 평균
-    mean_elapsed_pnum = df.groupby(["problem_number"])["elapsed"].agg(["mean", "sum", 'var', 'std']).reset_index()
-    mean_elapsed_pnum.columns = ["problem_number", "mean_elp_pnum_all_mean", "mean_elp_pnum_all_sum", "mean_elp_pnum_all_var", "mean_elp_pnum_all_std"]
-    df = pd.merge(df, mean_elapsed_pnum, on=["problem_number"], how="left")
+    mean_elapsed_pnum = df.groupby(["problem_num"])["elapsed"].agg(["mean", "sum", 'var', 'std']).reset_index()
+    mean_elapsed_pnum.columns = ["problem_num", "mean_elp_pnum_all_mean", "mean_elp_pnum_all_sum", "mean_elp_pnum_all_var", "mean_elp_pnum_all_std"]
+    df = pd.merge(df, mean_elapsed_pnum, on=["problem_num"], how="left")
 
-    mean_elapsed_pnum_o = correct_df.groupby(["problem_number"])["elapsed"].agg(["mean", "sum", 'var', 'std']).reset_index()
-    mean_elapsed_pnum_o.columns = ["problem_number", "mean_elp_pnum_o_mean", "mean_elp_pnum_o_sum", "mean_elp_pnum_o_var", "mean_elp_pnum_o_std"]
-    df = pd.merge(df, mean_elapsed_pnum_o, on=["problem_number"], how="left")
+    mean_elapsed_pnum_o = correct_df.groupby(["problem_num"])["elapsed"].agg(["mean", "sum", 'var', 'std']).reset_index()
+    mean_elapsed_pnum_o.columns = ["problem_num", "mean_elp_pnum_o_mean", "mean_elp_pnum_o_sum", "mean_elp_pnum_o_var", "mean_elp_pnum_o_std"]
+    df = pd.merge(df, mean_elapsed_pnum_o, on=["problem_num"], how="left")
 
-    mean_elapsed_pnum_x = wrong_df.groupby(["problem_number"])["elapsed"].agg(["mean", "sum", 'var', 'std']).reset_index()
-    mean_elapsed_pnum_x.columns = ["problem_number", "mean_elp_pnum_x_mean", "mean_elp_pnum_x_sum", "mean_elp_pnum_x_var", "mean_elp_pnum_x_std"]
-    df = pd.merge(df, mean_elapsed_pnum_x, on=["problem_number"], how="left")
+    mean_elapsed_pnum_x = wrong_df.groupby(["problem_num"])["elapsed"].agg(["mean", "sum", 'var', 'std']).reset_index()
+    mean_elapsed_pnum_x.columns = ["problem_num", "mean_elp_pnum_x_mean", "mean_elp_pnum_x_sum", "mean_elp_pnum_x_var", "mean_elp_pnum_x_std"]
+    df = pd.merge(df, mean_elapsed_pnum_x, on=["problem_num"], how="left")
 
-    # 유저 평균과의 시간 차이
+    # 이 전에 정답을 맞췄는지로 시간적 요소 반영
     for i in range(1,6):
         df[f"timestep_{i}"] = df.groupby("userID")["answerCode"].shift(i).fillna(1).astype(int)
 
@@ -163,10 +191,12 @@ def lightgbm_preprocess_data(df):
     correct_rate_per_user.columns = ['userID', 'correct_mean_per_user', 'correct_var_per_user', 'correct_std_per_user']
     df = pd.merge(df, correct_rate_per_user, on=['userID'], how='left')
 
-    # 유저별 시계열 정답률, 문제푼 횟수, 맞춘 문제수
-    df["problem_correct_per_user"] = (df.groupby("userID")["answerCode"].transform(lambda x: x.cumsum().shift(1)).fillna(0))
+    # 유저별 누적 푼 문제수, 누적 맞춘 갯수, 누적 정답률, 누적 푼 문제 시간 시계열 정답률, 문제푼 횟수, 맞춘 문제수
     df["problem_solved_per_user"] = df.groupby("userID")["answerCode"].cumcount()
+    df["problem_correct_per_user"] = (df.loc[:, ["userID", "answerCode"]].groupby("userID").agg({"answerCode": "cumsum"}))
+    #df["problem_correct_per_user"] = (df.groupby("userID")["answerCode"].transform(lambda x: x.cumsum().shift(1)).fillna(0))
     df["cum_answerRate_per_user"] = (df["problem_correct_per_user"] / df["problem_solved_per_user"]).fillna(0)
+    df["acc_elapsed_per_user"] = (df.loc[:, ["userID", "elapsed"]].groupby("userID").agg({"elapsed": "cumsum"}))
     
     # 유저별 태그 시계열 누적 값
     df["acc_tag_count_per_user"] = df.groupby(["userID", "KnowledgeTag"]).cumcount()
@@ -185,6 +215,11 @@ def lightgbm_preprocess_data(df):
     df["acc_answerRate_per_cat"] = (df["correct_answer_per_cat"] / df["acc_count_per_cat"]).fillna(0)
     df["acc_elapsed_per_cat"] = (df.groupby(["userID", "category"])["elapsed"].transform(lambda x: x.cumsum()).fillna(0))
 
+    # week of year별 누적 풀린 횟수, 누적 정답수, 누적 정답률
+    df["problem_solved_per_woy"] = (df.loc[:, ["weekofyear", "answerCode"]].groupby("weekofyear").agg({"answerCode": "cumcount"})+ 1)
+    df["problem_correct_per_woy"] = (df.loc[:, ["weekofyear", "answerCode"]].groupby("weekofyear").agg({"answerCode": "cumsum"}))
+    df["cum_answerRate_per_woy"] = (df["problem_correct_per_woy"] / df["problem_solved_per_woy"])
+
     return df
 
 def lightgbm_dataloader(args):
@@ -196,14 +231,9 @@ def lightgbm_dataloader(args):
             데이터 경로
     ----------
     """
-
     ######################## DATA LOAD
     train = pd.read_csv(args.data_dir + 'train_data.csv', parse_dates=["Timestamp"])
     test = pd.read_csv(args.data_dir + 'test_data.csv', parse_dates=["Timestamp"])
-    
-    train['dataset'] = 1
-    test['dataset'] = 2
-    
     data = pd.concat([train, test])
     
     return data
@@ -219,6 +249,14 @@ def lightgbm_datasplit(args, df):
             랜덤 seed 값
     ----------
     """
+    # df_train, df_test = df[df['answerCode']>=0], df[df['answerCode']==-1]
+    # df_train['is_valid'] = [False]*len(df_train)
+    # df_train.loc[df.drop_duplicates(subset="userID", keep="last").index, "is_valid"] = True    
+    
+    # train, valid = df_train[df_train['is_valid']==False], df[df['is_valid']==True]
+    # train, valid = train.drop('is_valid', axis=1), valid_drop('is_valid', axis=1)
+    
+    
     # correct_df, wrong_df = df[df['answerCode']==1], df[df['answerCode']==0]
     # correct1, correct2 = train_test_split(correct_df, test_size = 0.5, random_state = args.seed, shuffle = args.data_shuffle)
     # df = pd.concat([correct1, wrong_df])
