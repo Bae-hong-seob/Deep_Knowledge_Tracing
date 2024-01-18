@@ -3,32 +3,23 @@ import numpy as np
 
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
-from .utils import basic_feature_engineering, FE_aggregation
+from .utils import feature_engineering
 
 
 def lightgbm_preprocess_data(df):
-    
-    df = basic_feature_engineering(df)
-    df_1, df_2 = df.copy(), df.copy()
-    
-    fe = FE_aggregation()
-    df_user = fe.feature_per_user(df_1)
-    df_assessment = fe.feature_per_item(df_1)
-    df_tag = fe.feature_per_tag(df_1)
-    df_test = fe.feature_per_test(df_1)
-    df_cat = fe.feature_per_category(df_1)
-    df_problem_num = fe.feature_per_problem_num(df_1)
+    # 카테고리형 feature
+    categories = ['userID',"assessmentItemID", "testId"]
 
-    df = df_2.merge(df_user, how="left", on="userID")
-    df = df.merge(df_assessment, how="left", on="assessmentItemID")
-    df = df.merge(df_tag, how="left", on="KnowledgeTag")
-    df = df.merge(df_test, how="left", on="testId")
-    df = df.merge(df_cat, how="left", on="category_high")
-    df = df.merge(df_problem_num, how="left", on="problem_num")
+    for category in categories:
+        df[category] = df[category].astype("category")
+
+    # feature 생성
+    df = feature_engineering(df)
     
     le = preprocessing.LabelEncoder()
     for feature in df.columns:
-        if df[feature].dtypes == "object" or df[feature].dtypes == "UInt32":
+        if df[feature].dtypes == "object" or df[feature].dtypes == "UInt32" or df[feature].dtypes == 'category':
+            print(feature)
             df[feature] = le.fit_transform(df[feature])
     
     return df
