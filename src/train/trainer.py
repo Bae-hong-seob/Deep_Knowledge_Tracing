@@ -100,7 +100,7 @@ FEATURE_TEST = ["elapsed_median_per_test", "answerRate_per_test",
     'problem_count', 'tag_count', 'problem_position', #public 상승.
 ]
 FEATURE_CAT = ["elapsed_median_per_cat", "answerRate_per_cat",
-               "acc_elapsed_per_cat", #
+               #"acc_elapsed_per_cat", #valid 증가(과적합 에상)
                ]
 FEATURE_PROBLEM_NUM = [
     "elapsed_median_per_problem_num",
