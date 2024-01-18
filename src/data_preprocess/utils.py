@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
 
-def percentile(s):
-    return np.sum(s) / len(s)
 
 def elo(df, feature, elo_feat):
     def get_new_theta(is_good_answer, beta, left_asymptote, theta, nb_previous_answers):
@@ -141,21 +139,16 @@ def feature_engineering(df):
     df["category_high"] = df["testId"].apply(lambda x: x[2])
     # 문항 순서 Feature 추가
     df["problem_num"] = df["assessmentItemID"].apply(lambda x: int(x[-3:]))
+    
     # 시간 관련 요소 추가
     df["hour"] = df["Timestamp"].dt.hour
     df["weekofyear"] = df["Timestamp"].dt.isocalendar().week
 
-    # 유저별 누적 푼 문제수, 누적 맞춘 문제 갯수, 누적 정답률, 누적 푼 문제시간
-    df["problem_correct_per_user"] = (df.loc[:, ["userID", "answerCode"]].groupby("userID").agg({"answerCode": "cumsum"}))
-    df["problem_solved_per_user"] = (df.loc[:, ["userID", "answerCode"]].groupby("userID").agg({"answerCode": "cumcount"}) + 1)
-    df["cum_answerRate_per_user"] = (df["problem_correct_per_user"] / df["problem_solved_per_user"])
-    
-    df["acc_elapsed_per_user"] = (df.loc[:, ["userID", "elapsed"]].groupby("userID").agg({"elapsed": "cumsum"}))
-
-    # 대분류별 누적 풀린 횟수, 대분류별 누적 정답수, 대분류별 누적 정답률
+    # 대분류별 누적 풀린 횟수, 대분류별 누적 정답수, 대분류별 누적 정답률, 누적 풀이 시간
     df["correct_answer_per_cat"] = (df.groupby(["userID", "category_high"])["answerCode"].transform(lambda x: x.cumsum().shift(1)).fillna(0))
     df["acc_count_per_cat"] = (df.loc[:, ["category_high", "answerCode"]].groupby("category_high").agg({"answerCode": "cumcount"}))
     df["acc_answerRate_per_cat"] = (df["correct_answer_per_cat"] / df["acc_count_per_cat"])
+    df["acc_elapsed_per_cat"] = (df.groupby(["userID", "category_high"])["elapsed"].transform(lambda x: x.cumsum()).fillna(0))
 
     # week of year별 누적 풀린 횟수, 누적 정답수, 누적 정답률
     # week of year
@@ -194,6 +187,15 @@ def feature_engineering(df):
     df_user = pd.merge(df_user, tem3, on=["userID"], how="left")
     df_user.rename(columns={"assessmentItemID": "assessment_solved_per_user"}, inplace=True)
     df = df.merge(df_user, how="left", on="userID")
+
+    # 유저별 누적 푼 문제수, 누적 맞춘 문제 갯수, 누적 정답률, 누적 푼 문제시간
+    df["problem_correct_per_user"] = (df.loc[:, ["userID", "answerCode"]].groupby("userID").agg({"answerCode": "cumsum"}))
+    df["problem_solved_per_user"] = (df.loc[:, ["userID", "answerCode"]].groupby("userID").agg({"answerCode": "cumcount"}) + 1)
+    df["cum_answerRate_per_user"] = (df["problem_correct_per_user"] / df["problem_solved_per_user"])
+    df["acc_elapsed_per_user"] = (df.loc[:, ["userID", "elapsed"]].groupby("userID").agg({"elapsed": "cumsum"}))
+    
+    # # 유저별 태그 시계열 누적 값 # valid증가. 과적합 의심.
+    # df["acc_tag_count_per_user"] = df.groupby(["userID", "KnowledgeTag"]).cumcount()
     
     
     ##### 문제 단위
@@ -254,7 +256,7 @@ def feature_engineering(df):
     ##### category 단위
     
     # category별 문제 푼 시간의 중위수, 정답률
-    df_cat = (df.groupby("category_high").agg({"elapsed": "median", "answerCode": percentile}).reset_index())
+    df_cat = (df.groupby("category_high").agg({"elapsed": "median", "answerCode": 'mean'}).reset_index())
     df_cat.rename(columns={"elapsed": "elapsed_median_per_cat","answerCode": "answerRate_per_cat",},inplace=True,)
     df = df.merge(df_cat, how="left", on="category_high")
     
@@ -262,7 +264,7 @@ def feature_engineering(df):
     ##### item num 단위
     
     # 문항 순서별 문제 푼 시간의 중위수, 정답률
-    df_problem_num = (df.groupby("problem_num").agg({"elapsed": "median", "answerCode": percentile}).reset_index())
+    df_problem_num = (df.groupby("problem_num").agg({"elapsed": "median", "answerCode": 'mean'}).reset_index())
     df_problem_num.rename(columns={"elapsed": "elapsed_median_per_problem_num","answerCode": "answerRate_per_problem_num",},inplace=True,)
     df = df.merge(df_problem_num, how="left", on="problem_num")
     

@@ -92,12 +92,16 @@ FEATURE_ITEM = [
     "wrong_users_median_elapsed",
     "correct_users_median_elapsed",
 ]
-FEATURE_TAG = ["tag_exposed", "answerRate_per_tag"]
+FEATURE_TAG = ["tag_exposed", "answerRate_per_tag",
+               #"acc_tag_count_per_user" #valid 증가(과적합 예상)
+               ]
 FEATURE_TEST = ["elapsed_median_per_test", "answerRate_per_test",
     'solve_count_per_test', 'number_of_users_per_test', #valid 그대로, acc만 감소
-    'problem_count', 'tag_count', 'problem_position',
+    'problem_count', 'tag_count', 'problem_position', #public 상승.
 ]
-FEATURE_CAT = ["elapsed_median_per_cat", "answerRate_per_cat"]
+FEATURE_CAT = ["elapsed_median_per_cat", "answerRate_per_cat",
+               "acc_elapsed_per_cat", #
+               ]
 FEATURE_PROBLEM_NUM = [
     "elapsed_median_per_problem_num",
     "answerRate_per_problem_num",

@@ -7,6 +7,7 @@ from .utils import feature_engineering
 
 
 def lightgbm_preprocess_data(df):
+    
     # 카테고리형 feature
     categories = ['userID',"assessmentItemID", "testId"]
 
