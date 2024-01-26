@@ -4,5 +4,4 @@ predict.py
 test.py
 AutogluonModels
 submit
-record.txt
 record

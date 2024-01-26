@@ -1,0 +1,51 @@
+Tiemstamp:20240109_??????, valid auc:0.8642358245198034, valid_acc:0.8067249679329839 public:0.8156 #시험지별 문제 길이, 푼 사용자 수 추가
+Tiemstamp:20240109_051923, valid auc:0.8642053508648047, valid_acc:0.8066319339973713 public:0.8154 #시험지별 안 푼 문제 개수, 문제를 푼 비율 추가
+Tiemstamp:20240109_064017, valid auc:0.8648930464300232, valid_acc:0.8071881581656083 public:0.8081 #태그별, 문항별, 문제 번호별 sum,var,std변수 추가
+Tiemstamp:20240109_065406, valid auc:0.8643571736582704, valid_acc:0.806728926823861  public:0.8108 #시험지별, 문항별 개수,분산,표준편차 변수 삭제
+
+Tiemstamp:20240109_070200, valid auc:0.8642358245198034, valid_acc:0.8067249679329839 public:재현성 확인용. 1번째와 같음
+Tiemstamp:20240109_074012, valid auc:0.8642691946974839, valid_acc:0.8067863307415795 public:0.8140 #userID추가
+Tiemstamp:20240109_075015, valid auc:0.8614992983751156, valid_acc:0.8058916214033477 #userID category변수 추가
+Tiemstamp:20240109_075548, valid auc:0.8614819653006791, valid_acc:0.8056065812601941 public:0.8039 #userID, KnowledgeTag category변수 추가
+Tiemstamp:20240109_081619, valid auc:0.8588661504124571, valid_acc:0.8014616225118371 #timestep1,2,3,4,5 변수 제거
+Tiemstamp:20240111_055441, valid auc:0.8642358245198034, valid_acc:0.8067249679329839 #정답자/오답자 평균 문제 풀이 시간 변수 추가.
+Tiemstamp:20240111_060227, valid auc:0.8642358245198034, valid_acc:0.8067249679329839 #안믿겨서 재현성 추가. 11번째줄 변수 추가하나 안하나 차이가없네
+Tiemstamp:20240111_085116, valid auc:0.9455470137305655, valid_acc:0.8730759790337139 public:0.6776 #유저별 전체 정답 평균,분산,표준편차 변수 추가 + (유저별+태그별) 문제풀이 횟수, 정답률(평균, 분산, 표준편차) 변수 추가
+Tiemstamp:20240111_085921, valid auc:0.8661931397936362, valid_acc:0.8082629970387496 public:0.8119 #유저별 전체 정답 평균,분산,표준편차 변수 추가 
+
+start feature selection
+Tiemstamp:20240113_051220, valid auc:0.8642358245198034, valid_acc:0.8067249679329839 #1번째 재현
+Tiemstamp:20240113_054428, valid auc:0.8587577891529847, valid_acc:0.8014299513848200 public:0.8181 #top score 재현 + feautre selection = 'median'(26개)
+Tiemstamp:20240113_065629, valid auc:0.8642358245198034, valid_acc:0.8067249679329839 #1번째 재현. train column 순서에 따라 차이가 있네?
+Tiemstamp:20240113_071119, valid auc:0.9457667250167577, valid_acc:0.8731294240605552 public:0.6775 #13번째 (모든 feature) -> feature selection = 'median'
+Tiemstamp:20240113_115425, valid auc:0.9443887447848955, valid_acc:0.8710549652409381
+Tiemstamp:20240113_124631, valid auc:0.8646281903515132, valid_acc:0.7837650146836397 public:0.8073 #train 0:1 비율이 거의 5:5가 되도록 수정
+Tiemstamp:20240113_125609, valid auc:0.8656278965066690, valid_acc:0.8074030087094220 public:0.8150	#1번과 같이 + train/valid 비율 50:1
+Tiemstamp:20240113_130742, valid auc:0.8604094275894171, valid_acc:0.8033650039588281 public:0.8153 #22번 + feature selection = 'median'
+Tiemstamp:20240113_131607, valid auc:0.8656278965066690, valid_acc:0.8074030087094220 #threshold=0.2 실수
+Tiemstamp:20240113_132430, valid auc:0.8602344044256046, valid_acc:0.8033847980997625 public:0.8088 #threshold=0.2*max(feature_importance) feature 29개
+Tiemstamp:20240113_133232, valid auc:0.8604094275894171, valid_acc:0.8033650039588281 #23줄 재현 확인
+Tiemstamp:20240113_133811, valid auc:0.8587577891529847, valid_acc:0.8014299513848200 #17줄 재현 확인 #0.8156 + 'median' + args.test_size=0.2
+Tiemstamp:20240113_134508, valid auc:0.8575263939468674, valid_acc:0.8002779141395746 public:0.8134 #0.8181 + 1.25median
+Tiemstamp:20240113_135243, valid auc:0.8583218547157552, valid_acc:0.8009568639250028 public:0.8183 #0.8181 + 1.1median
+Tiemstamp:20240113_140502, valid auc:0.8651812175449335, valid_acc:0.8071089803480657 public:0.7987 #(유저별+태그별) 문제풀이 횟수, 정답률(평균, 분산, 표준편차) 변수를 제외한 모든 변수(90) + 1.5median(34개)
+
+Tiemstamp:20240116_061608, valid auc:0.8771421178103287, valid_acc:0.8161213954298564 public:0.8170 #ipynb아니라 github 코드 그대로.
+Tiemstamp:20240116_062827, valid auc:0.8223476499850159, valid_acc:0.6541156629558663 public:0.7869 #hyper-parameter github 참고
+Tiemstamp:20240116_071614, valid auc:0.8780178313673228, valid_acc:0.8169290091687913 public:0.8137 #시험지별, 태그별, 문항별, 문제 번호별 기술통계량 추가
+Tiemstamp:20240116_073748, valid auc:0.8768975278853268, valid_acc:0.8154464045353054 public:0.8094 #34번 + 1.1median
+Tiemstamp:20240118_043509, valid auc:0.8771421178103287, valid_acc:0.8161213954298564 #33번 재현성 확인. 코드 간결화
+Tiemstamp:20240118_045729, valid auc:0.8771421178103287, valid_acc:0.8161213954298564 #userID category변수로 처리해서 labelencoding. 변화없음.
+Tiemstamp:20240118_050322, valid auc:0.8812271552825316, valid_acc:0.8197180477917306 public:0.8137 #userID feature 제거
+Tiemstamp:20240118_051320, valid auc:0.8779126150542211, valid_acc:0.8167587768610746 public:0.8170 #시험지별 푼 문제 수, 푼 사용자 수 추가, but acc 감소.
+Tiemstamp:20240118_053253, valid auc:0.8768451258581177, valid_acc:0.8160303409396823 public:0.8181 #problem_num을 int형으로 + 시험지별 문제 길이(문제 수), 태그 수 추가.
+Tiemstamp:20240118_054236, valid auc:0.8768451258581177, valid_acc:0.8160303409396823 #재현 확인. percentile 함수 .agg('mean')으로 대체.
+Tiemstamp:20240118_060223, valid auc:0.8806706867312116, valid_acc:0.8203791825682117 public:0.8006 #df 정렬 수정, grouping변수 추가, elapsed 방식 변경, elapsed_shift변수 추가.
+Tiemstamp:20240118_060958, valid auc:0.8781622299579634, valid_acc:0.8174397060919413 #df 정렬 수정 효과 확인. 이게 안좋기도 함.
+Tiemstamp:20240118_063049, valid auc:0.8781510237919439, valid_acc:0.8171289331580864 #"acc_tag_count_per_user"변수 추가. 과적합을 야기하는 변수인듯
+Tiemstamp:20240118_064118, valid auc:0.8793235544916906, valid_acc:0.8183542098845588 # "acc_elapsed_per_cat"변수 추가. 이 또한 과적합 야기 변수.
+Tiemstamp:20240118_064624, valid auc:0.8768451258581177, valid_acc:0.8160303409396823 #0.8181 재현 확인.
+Tiemstamp:20240118_065259, valid auc:0.8712580337093835, valid_acc:0.8104483048029264 public:0.8156 #0.8181 + 'median'
+Tiemstamp:20240118_071042, valid auc:0.8776456519344600, valid_acc:0.8167053318342333 #threshold 300
+Tiemstamp:20240118_071757, valid auc:0.8763142470250858, valid_acc:0.8146566058053176 public:0.8098 #threshold 400
+Tiemstamp:20240118_072903, valid auc:0.8768451258581177, valid_acc:0.8160303409396823 #threshold 1 (feature importance 0인 변수 2개 제거) = 결과 똑같음.
