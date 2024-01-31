@@ -98,7 +98,7 @@
     - TabNet : 0.7732
     - SASRec: 0.8099
 
-## Result
+## Result(public 3st, private 3st)
 
 - Ensemble 구현
     - Ensemble 진행할 모델 선정
@@ -109,3 +109,10 @@
     - 모델 평가 방식 : **AUROC**, ACC
 - 시연 결과
     - Ensemble을 통해 전반적으로 Public Score가 상승하였으며 단일 모델보다 Public Score가 떨어진 경우에도 Private Score가 상승하는 것을 대회 종료 후 확인할 수 있었음.
+ 
+**public : 0.8255**
+![image](https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/0819642e-196b-4bb2-9ab4-efafac1da279)
+
+
+**private : 0.8523**
+![image](https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/a8917ad3-a09e-48fa-86d3-52c223a05e13)
