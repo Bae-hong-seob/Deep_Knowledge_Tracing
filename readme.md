@@ -97,3 +97,15 @@
     - Catboostregressor : 0.8057
     - TabNet : 0.7732
     - SASRec: 0.8099
+
+## Result
+
+- Ensemble 구현
+    - Ensemble 진행할 모델 선정
+        - Public Score 0.8 이상 Model 4개 선정 (lightGBM, LightGCN, UltraGCN, SASRec)
+    - Ouput 값에 대해 Model 다른 가중치를 부여, 가중 평균을 통해 최종 Output 도출
+        - LightGBM * 0.7 + Catboost * 0.1 + SASRec * 0.1 + UltraGCN * 0.05 + LightGCN * 0.05
+- 모델 평가 및 개선
+    - 모델 평가 방식 : **AUROC**, ACC
+- 시연 결과
+    - Ensemble을 통해 전반적으로 Public Score가 상승하였으며 단일 모델보다 Public Score가 떨어진 경우에도 Private Score가 상승하는 것을 대회 종료 후 확인할 수 있었음.
