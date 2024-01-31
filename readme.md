@@ -41,3 +41,16 @@
 3. 배홍섭 : [Team Leader] Feature Engineering 및 Lightgbm 고도화  
 4. 안제준 : Catboost, BERT4REC 구현  
 5. 윤도현 : 데이터 EDA, TabNet, LastQuery 구현  
+
+## Schedule
+
+- competition : 2024-01-03 ~ 2024-01-25
+<img width="1000" alt="스크린샷 2024-01-29 오전 2 07 46" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/75f2bafb-3e6d-4bca-b91a-c2ec340eab43"><br>
+
+1. 프로젝트 개발환경 구축 (Server, Github, Google Drive, WandB)
+2. EDA를 통해 데이터 분포 파악 및 Feature Engineering에 필요한 Insight 도출
+3. 베이스라인 코드에 대한 이해를 바탕으로 모델 개선점 파악
+4. Feature Engineering을 통해 데이터 설명력 증진
+5. 리서치를 바탕으로 Baseline보다 뛰어난 성능의 모델 구현 및 Fine-Tuning
+6. Post-Processing 및 Public Score을 기준으로 고성능 모델 간 Ensemble 진행
+7. 최종 제출
