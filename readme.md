@@ -54,3 +54,11 @@
 5. 리서치를 바탕으로 Baseline보다 뛰어난 성능의 모델 구현 및 Fine-Tuning
 6. Post-Processing 및 Public Score을 기준으로 고성능 모델 간 Ensemble 진행
 7. 최종 제출
+
+## Feature Engineering
+
+- 데이터 전처리 및 EDA
+    - test data 전체 372, 정답 맞춘 사람 176명 public acc:0.4731
+ <img width="1000" alt="Untitled (1)" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/200e18a4-928e-4c3c-a5bf-caa11aa3041b"><br>
+ 
+    - train set에 0과1 비율을 872368:826794, 즉 1 비율이 0.4865로 조정
