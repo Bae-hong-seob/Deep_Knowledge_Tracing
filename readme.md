@@ -60,12 +60,12 @@
 ## Feature Engineering
 
 - 데이터 전처리 및 EDA
-    - test data 전체 372, 정답 맞춘 사람 176명 public acc:0.4731  
-
- <img width="1000" alt="Untitled (1)" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/200e18a4-928e-4c3c-a5bf-caa11aa3041b"><br>
-
- 
+    - test data 전체 372, 정답 맞춘 사람 176명 public acc:0.4731
     - train set에 0과1 비율을 872368:826794, 즉 1 비율이 0.4865로 조정
+
+<img width="1000" alt="Untitled (1)" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/200e18a4-928e-4c3c-a5bf-caa11aa3041b"><br>
+ 
+    
 - Users Feature Engineering
     - 유저별 정답률, 푼 문제 수, 정답 맞춘 횟수
     - 유저별 평균(중앙값) 소요 시간
