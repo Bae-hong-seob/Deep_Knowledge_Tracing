@@ -9,6 +9,7 @@
 
 ## Introduction
 <img width="403" alt="Untitled" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/b2c28c54-13d4-406e-8469-a793635dced7">
+<br>
 - DKT는 Deep Knowledge Tracing의 약자로 우리의 "지식 상태"를 추적하는 딥러닝 방법론
     - 시험에 대해 과목을 얼마만큼 이해하고 있는지 측정 및 활용하여 아직 풀지 않은 미래의 
     문제에 대한 정답 여부를 확인할 수 있다.
