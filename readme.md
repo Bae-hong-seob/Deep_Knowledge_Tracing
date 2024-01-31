@@ -46,7 +46,7 @@
 
 - competition : 2024-01-03 ~ 2024-01-25
 
-<img width="500" alt="스크린샷 2024-01-29 오전 2 07 46" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/75f2bafb-3e6d-4bca-b91a-c2ec340eab43"><br>
+<img width="700" alt="스크린샷 2024-01-29 오전 2 07 46" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/75f2bafb-3e6d-4bca-b91a-c2ec340eab43"><br>
 
 
 1. 프로젝트 개발환경 구축 (Server, Github, Google Drive, WandB)
@@ -63,7 +63,7 @@
     - test data 전체 372, 정답 맞춘 사람 176명 public acc:0.4731
     - train set에 0과1 비율을 872368:826794, 즉 1 비율이 0.4865로 조정
 
-<img width="1000" alt="Untitled (1)" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/200e18a4-928e-4c3c-a5bf-caa11aa3041b"><br>
+<img width="500" alt="Untitled (1)" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/200e18a4-928e-4c3c-a5bf-caa11aa3041b"><br>
  
     
 - Users Feature Engineering
