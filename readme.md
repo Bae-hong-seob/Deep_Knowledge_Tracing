@@ -45,7 +45,7 @@
 ## Schedule
 
 - competition : 2024-01-03 ~ 2024-01-25
-<img width="1000" alt="스크린샷 2024-01-29 오전 2 07 46" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/75f2bafb-3e6d-4bca-b91a-c2ec340eab43"><br>
+<img width="500" alt="스크린샷 2024-01-29 오전 2 07 46" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/75f2bafb-3e6d-4bca-b91a-c2ec340eab43"><br>
 
 1. 프로젝트 개발환경 구축 (Server, Github, Google Drive, WandB)
 2. EDA를 통해 데이터 분포 파악 및 Feature Engineering에 필요한 Insight 도출
@@ -62,3 +62,34 @@
  <img width="1000" alt="Untitled (1)" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/200e18a4-928e-4c3c-a5bf-caa11aa3041b"><br>
  
     - train set에 0과1 비율을 872368:826794, 즉 1 비율이 0.4865로 조정
+- Users Feature Engineering
+    - 유저별 정답률, 푼 문제 수, 정답 맞춘 횟수
+    - 유저별 평균(중앙값) 소요 시간
+    - 유저별 푼 문제 수
+    - 유저별 누적 푼 문제수, 누적 맞춘 문제 갯수, 누적 정답률, 누적 푼 문제시간
+- Time Feature Engineering
+    - 각 문제 푸는 시간
+    - 시간 관련 feature 추가(hour, weekofyear)
+    - 대분류별 누적 풀린 횟수, 대분류별 누적 정답수, 대분류별 누적 정답률, 누적 풀이 시간
+    - 태그별 모든 문제, 맞춘 문제, 틀린 문제별 풀이 시간의 평균
+    - 문항별 모든 문제, 맞춘 문제, 틀린 문제별 풀이 시간의 평균
+    - 문제 번호별 모든 문제, 맞춘 문제, 틀린 문제별 풀이 시간의 평균
+    - 이 전에 정답을 맞췄는지로 시간적 요소 반영
+- Test Feature Engineering
+    - 시험지별 푼 문제 개수, 푼 사용자 수
+    - 시험지 별 문제 수와 태그 수
+    - 시험지 별 안 푼 문제 개수, 문제를 푼 비율
+    - 시험지별 정답 평균, 개수, 분산, 표준편차
+    - 문항별 정답 평균, 개수, 분산, 표준편차
+    - 문제 번호별 정답 평균, 개수, 분산, 표준편차
+- Tag Feature Engineering
+    - 태그별 정답 평균, 개수, 분산, 표준편차
+    - 태그별 모든 문제, 맞춘 문제, 틀린 문제별 풀이 시간의 평균
+    
+- 모델 선정 및 분석 : public score기준 각 데이터에서 좋은 성능을 보이는 모델을 선정
+    - LightGBM : 0.8255
+    - GCN : 0.7888
+    - XLNet: 0.7308
+    - Catboostregressor : 0.8057
+    - TabNet : 0.7732
+    - SASRec: 0.8099
