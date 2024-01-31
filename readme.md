@@ -48,6 +48,7 @@
 
 <img width="500" alt="스크린샷 2024-01-29 오전 2 07 46" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/75f2bafb-3e6d-4bca-b91a-c2ec340eab43"><br>
 
+
 1. 프로젝트 개발환경 구축 (Server, Github, Google Drive, WandB)
 2. EDA를 통해 데이터 분포 파악 및 Feature Engineering에 필요한 Insight 도출
 3. 베이스라인 코드에 대한 이해를 바탕으로 모델 개선점 파악
@@ -59,9 +60,10 @@
 ## Feature Engineering
 
 - 데이터 전처리 및 EDA
-    - test data 전체 372, 정답 맞춘 사람 176명 public acc:0.4731
+    - test data 전체 372, 정답 맞춘 사람 176명 public acc:0.4731  
 
  <img width="1000" alt="Untitled (1)" src="https://github.com/Bae-hong-seob/Deep_Knowledge_Tracing/assets/49437396/200e18a4-928e-4c3c-a5bf-caa11aa3041b"><br>
+
  
     - train set에 0과1 비율을 872368:826794, 즉 1 비율이 0.4865로 조정
 - Users Feature Engineering
