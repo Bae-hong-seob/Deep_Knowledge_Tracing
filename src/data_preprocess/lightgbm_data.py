@@ -7,24 +7,7 @@ from .utils import feature_engineering
 
 
 def lightgbm_preprocess_data(df):
-    
-    # 카테고리형 feature
-    categories = ['userID',"assessmentItemID", "testId"]
 
-    for category in categories:
-        df[category] = df[category].astype("category")
-
-    # feature 생성
-    df = feature_engineering(df)
-    
-    le = preprocessing.LabelEncoder()
-    for feature in df.columns:
-        if df[feature].dtypes == "object" or df[feature].dtypes == "UInt32" or df[feature].dtypes == 'category':
-            print(feature)
-            df[feature] = le.fit_transform(df[feature])
-    
-    return df
-    
     ########## 기본 feature ##########
 
     # 유저별 시퀀스를 고려하기 위해 정렬
@@ -71,11 +54,11 @@ def lightgbm_preprocess_data(df):
     df = pd.merge(df, test, on="testId", how="left")
     df["problem_position"] = df["problem_num"] / df["problem_count"]
 
-    # 시험지 별 안 푼 문제 개수, 문제를 푼 비율 -> valid score감소, public score 감소
+    # 시험지 별 안 푼 문제 개수, 문제를 푼 비율 
     df['not_solving_count_per_test'] = df['problem_count'] - df['solve_count_per_test']
     df['problem_solving_rate_per_test'] = df['solve_count_per_test'] / df['problem_count']
 
-    # 시험지별 정답 평균, 개수, 분산, 표준편차 -> 평균만 생성시 public score 감소
+    # 시험지별 정답 평균, 개수, 분산, 표준편차 
     per_test = df.groupby(["testId"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
     per_test.columns = ["answerRate_per_test", "answerCount_per_test", "answerVar_per_test", "answerStd_per_test"]
     df = pd.merge(df, per_test, on=["testId"], how="left")
@@ -85,7 +68,7 @@ def lightgbm_preprocess_data(df):
     per_tag.columns = ["answerRate_per_tag", "answerCount_per_tag", "answerVar_per_tag", "answerStd_per_tag"]
     df = pd.merge(df, per_tag, on=["KnowledgeTag"], how="left")
 
-    # 문항별 정답 평균, 개수, 분산, 표준편차 -> 평균만 생성시 public score 감소
+    # 문항별 정답 평균, 개수, 분산, 표준편차 
     per_ass = df.groupby(["assessmentItemID"])["answerCode"].agg(["mean", "sum", 'var', 'std'])
     per_ass.columns = ["answerRate_per_ass", "answerCount_per_ass", "answerVar_per_ass", "answerStd_per_ass"]
     df = pd.merge(df, per_ass, on=["assessmentItemID"], how="left")
@@ -207,10 +190,10 @@ def lightgbm_preprocess_data(df):
     df["acc_answerRate_per_cat"] = (df["correct_answer_per_cat"] / df["acc_count_per_cat"]).fillna(0)
     df["acc_elapsed_per_cat"] = (df.groupby(["userID", "category"])["elapsed"].transform(lambda x: x.cumsum()).fillna(0))
 
-    # week of year별 누적 풀린 횟수, 누적 정답수, 누적 정답률
-    df["problem_solved_per_woy"] = (df.loc[:, ["weekofyear", "answerCode"]].groupby("weekofyear").agg({"answerCode": "cumcount"})+ 1)
-    df["problem_correct_per_woy"] = (df.loc[:, ["weekofyear", "answerCode"]].groupby("weekofyear").agg({"answerCode": "cumsum"}))
-    df["cum_answerRate_per_woy"] = (df["problem_correct_per_woy"] / df["problem_solved_per_woy"])
+    # # week of year별 누적 풀린 횟수, 누적 정답수, 누적 정답률
+    # df["problem_solved_per_woy"] = (df.loc[:, ["weekofyear", "answerCode"]].groupby("weekofyear").agg({"answerCode": "cumcount"})+ 1)
+    # df["problem_correct_per_woy"] = (df.loc[:, ["weekofyear", "answerCode"]].groupby("weekofyear").agg({"answerCode": "cumsum"}))
+    # df["cum_answerRate_per_woy"] = (df["problem_correct_per_woy"] / df["problem_solved_per_woy"])
 
     return df
 
@@ -241,18 +224,6 @@ def lightgbm_datasplit(args, df):
             랜덤 seed 값
     ----------
     """
-    # df_train, df_test = df[df['answerCode']>=0], df[df['answerCode']==-1]
-    # df_train['is_valid'] = [False]*len(df_train)
-    # df_train.loc[df.drop_duplicates(subset="userID", keep="last").index, "is_valid"] = True    
-    
-    # train, valid = df_train[df_train['is_valid']==False], df[df['is_valid']==True]
-    # train, valid = train.drop('is_valid', axis=1), valid_drop('is_valid', axis=1)
-    
-    
-    # correct_df, wrong_df = df[df['answerCode']==1], df[df['answerCode']==0]
-    # correct1, correct2 = train_test_split(correct_df, test_size = 0.5, random_state = args.seed, shuffle = args.data_shuffle)
-    # df = pd.concat([correct1, wrong_df])
-    
     train, valid = train_test_split(df[df['answerCode'] != -1], test_size = args.test_size, random_state = args.seed, shuffle = args.data_shuffle)
 
     y_train = train["answerCode"]
