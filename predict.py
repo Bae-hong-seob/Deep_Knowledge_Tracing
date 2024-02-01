@@ -107,64 +107,6 @@ FEATS = [ # best feature 52개 + private에서 좋았던 2개 = 54개
 #     'correct_mean_per_user', 'correct_var_per_user', 'correct_std_per_user',
 # ]
 
-# ######################## SELECT FEATURE
-
-# FEATURE = [
-#     "userID",
-#     "assessmentItemID",
-#     "KnowledgeTag",
-#     "elapsed",
-#     "category_high",
-#     "problem_num",
-#     "cum_answerRate_per_user",
-#     "acc_elapsed_per_user",
-#     "problem_correct_per_user",
-#     "problem_solved_per_user",
-#     "correct_answer_per_cat",
-#     "acc_count_per_cat",
-#     "acc_answerRate_per_cat",
-#     "timeDelta_userAverage",
-#     "timestep_1",
-#     "timestep_2",
-#     "timestep_3",
-#     "timestep_4",
-#     "timestep_5",
-#     "hour",
-#     "weekofyear",
-#     "problem_correct_per_woy",
-#     "problem_solved_per_woy",
-#     "cum_answerRate_per_woy",
-# ]
-# FEATURE_USER = [
-#     "answerRate_per_user",
-#     "answer_cnt_per_user",
-#     "elapsed_time_median_per_user",
-#     "assessment_solved_per_user",
-# ]
-# FEATURE_ITEM = [
-#     "answerRate_per_item",
-#     "answer_cnt_per_item",
-#     "elapsed_time_median_per_item",
-#     "wrong_users_median_elapsed",
-#     "correct_users_median_elapsed",
-# ]
-# FEATURE_TEST = ["elapsed_median_per_test", "answerRate_per_test", "answerCount_per_test", "answerVar_per_test", "answerStd_per_test"]
-# FEATURE_TAG = ["tag_exposed",  "answerRate_per_tag", "answerCount_per_tag", "answerVar_per_tag", "answerStd_per_tag"]
-# FEATURE_CAT = ["elapsed_median_per_cat", "answerRate_per_cat"]
-# FEATURE_PROBLEM_NUM = [#"answerRate_per_ass", "answerCount_per_ass", "answerVar_per_ass", "answerStd_per_ass",
-#     "elapsed_median_per_problem_num","answerRate_per_problem_num",#"answerCount_per_problem_num","answerVar_per_problem_num","answerStd_per_problem_num"
-#     ]
-# FEATURE_ELO = ["elo_assessment", "elo_test", "elo_tag"]
-
-# FEATURE += FEATURE_USER
-# FEATURE += FEATURE_ITEM
-# FEATURE += FEATURE_TEST
-# FEATURE += FEATURE_TAG
-# FEATURE += FEATURE_CAT
-# FEATURE += FEATURE_PROBLEM_NUM
-# FEATURE += FEATURE_ELO
-# FEATS = FEATURE
-
 def main(args):
     ####################### Setting for Log
     setting = Setting()
